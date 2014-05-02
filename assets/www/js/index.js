@@ -1,6 +1,7 @@
 var app = {
     // Application Constructor
     initialize: function() {
+		this.initializeMap();
         this.bindEvents();
     },
     // Bind Event Listeners
@@ -11,11 +12,12 @@ var app = {
         document.addEventListener('deviceready', this.onDeviceReady, false);
     },
     onDeviceReady: function() {
+		var self = this;
         app.receivedEvent('deviceready');
         $("#track-me").click(function(){
 			app.trackMe();
 			//app.playBeep(1);
-			app.vibrate(500);
+			app.vibrate(100);
 		});
     },
     // Update DOM on a Received Event
@@ -26,11 +28,9 @@ var app = {
 
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
-
-        console.log('Received Event: ' + id);
     },
     trackMe: function(){
-		navigator.geolocation.watchPosition(this.geoSuccess, this.geoError,{
+		navigator.geolocation.getCurrentPosition(this.geoSuccess, this.geoError,{
 			enableHighAccuracy: true,
 			timeout : 1000
 		});
@@ -45,11 +45,12 @@ var app = {
                        'Heading: ' + position.coords.heading + '<br />' +
                        'Speed: ' + position.coords.speed + '<br />' +
                        'Timestamp: ' + new Date(position.timestamp) + '<br />';
-		$(".location-data").html(location);
-		app.fetchAddress(position);
+		//$(".location-data").html(location);
+		//app.fetchAddress(position);
+		app.locateOnMap(position);
+		console.log("located on map");
 	},
 	fetchAddress: function(position){
-		console.log("here fetched address");
 		$.ajax({
 			url  : 'https://maps.googleapis.com/maps/api/geocode/json',
 			data : {
@@ -69,13 +70,40 @@ var app = {
 		});
 	},
 	geoError: function(error){
-		console.log(error);
+		console.log(error.code);
+		app.trackMe();
 	},
 	playBeep: function(times) {
         navigator.notification.beep(times);
     },
     vibrate: function(interval) {
         navigator.notification.vibrate(interval);
-    }
+    },
+    locateOnMap: function(position){
+		var clientPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		if( typeof marker != 'undefined' ){
+			marker.setMap(null);
+		}
+		marker = new google.maps.Marker({
+			position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+			map: gmap,
+			title: "You",
+			animation: google.maps.Animation.DROP
+		});
+		//var bounds = new google.maps.LatLngBounds();
+		//bounds.extend(clientPosition);
+		//gmap.fitBounds(bounds);
+		gmap.setZoom(15);
+		gmap.setCenter(marker.getPosition());
+	},
+	initializeMap: function() {
+		var mapOptions = {
+			center: new google.maps.LatLng(21.1289956,82.7792201),
+			zoom: 3,
+			mapTypeId: google.maps.MapTypeId.ROADMAP,
+			disableDefaultUI: true
+		};
+		gmap = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+	}
 
 };

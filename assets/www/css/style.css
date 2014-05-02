@@ -72,3 +72,22 @@ h1 {
 	font-size:10px;
 	margin-top:10px;
 }
+html, body, #map_canvas {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+.map-box{
+	background: linear-gradient(#F0F0F0, #E9EAEB) repeat scroll 0 0 #E9EAEB;
+    border: 1px solid #B3B3B3;
+    color: #3E3E3E;
+    font-weight: bold;
+    text-shadow: 0 1px 1px #FFFFFF;
+    padding: 1em;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    border-radius: 0.6em;
+    width:90%;
+    margin:auto;
+}
+html, body { height: 100%; }
